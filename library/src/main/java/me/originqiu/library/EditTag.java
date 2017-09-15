@@ -20,10 +20,10 @@ package me.originqiu.library;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.support.v7.widget.AppCompatTextView;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,17 +32,16 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by OriginQiu on 4/7/16.
  */
-public class EditTag extends FrameLayout
-        implements View.OnClickListener, TextView.OnEditorActionListener, View.OnKeyListener {
+public class EditTag extends FrameLayout implements View.OnClickListener, TextView.OnEditorActionListener, View.OnKeyListener {
 
     private FlowLayout flowLayout;
 
@@ -97,20 +96,16 @@ public class EditTag extends FrameLayout
     public EditTag(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         TypedArray mTypedArray = context.obtainStyledAttributes(attrs, R.styleable.EditTag);
-        tagViewLayoutRes =
-                mTypedArray.getResourceId(R.styleable.EditTag_tag_layout, R.layout.view_default_tag);
-        inputTagLayoutRes = mTypedArray.getResourceId(R.styleable.EditTag_input_layout,
-                R.layout.view_default_input_tag);
-        deleteModeBgRes =
-                mTypedArray.getResourceId(R.styleable.EditTag_delete_mode_bg, R.color.colorAccent);
+        tagViewLayoutRes = mTypedArray.getResourceId(R.styleable.EditTag_tag_layout, R.layout.view_default_tag);
+        inputTagLayoutRes = mTypedArray.getResourceId(R.styleable.EditTag_input_layout, R.layout.view_default_input_tag);
+        deleteModeBgRes = mTypedArray.getResourceId(R.styleable.EditTag_delete_mode_bg, R.color.colorAccent);
         mTypedArray.recycle();
         setupView();
     }
 
     private void setupView() {
         flowLayout = new FlowLayout(getContext());
-        LayoutParams layoutParams =
-                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+        LayoutParams layoutParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         flowLayout.setLayoutParams(layoutParams);
         addView(flowLayout);
         addInputTagView();
@@ -128,6 +123,24 @@ public class EditTag extends FrameLayout
     private void setupListener() {
         editText.setOnEditorActionListener(this);
         editText.setOnKeyListener(this);
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // capture SPACE and COMMA press on keyboard
+                if (s.toString().contains(" ") || s.toString().contains(","))
+                onEditorAction(null, EditorInfo.IME_ACTION_DONE, null);
+            }
+        });
     }
 
     @Override
@@ -170,8 +183,7 @@ public class EditTag extends FrameLayout
             if (TextUtils.isEmpty(tagContent)) {
                 // do nothing, or you can tip "can'nt add empty tag"
             } else {
-                if (tagAddCallBack == null || (tagAddCallBack != null
-                        && tagAddCallBack.onTagAdd(tagContent))) {
+                if (tagAddCallBack == null || (tagAddCallBack != null && tagAddCallBack.onTagAdd(tagContent))) {
                     TextView tagTextView = createTag(flowLayout, tagContent);
                     if (defaultTagBg == null) {
                         defaultTagBg = tagTextView.getBackground();
@@ -231,15 +243,13 @@ public class EditTag extends FrameLayout
     }
 
     private TextView createTag(ViewGroup parent, String s) {
-        TextView tagTv =
-                (TextView) LayoutInflater.from(getContext()).inflate(tagViewLayoutRes, parent, false);
+        TextView tagTv = (TextView) LayoutInflater.from(getContext()).inflate(tagViewLayoutRes, parent, false);
         tagTv.setText(s);
         return tagTv;
     }
 
     private EditText createInputTag(ViewGroup parent) {
-        editText =
-                (EditText) LayoutInflater.from(getContext()).inflate(inputTagLayoutRes, parent, false);
+        editText = (EditText) LayoutInflater.from(getContext()).inflate(inputTagLayoutRes, parent, false);
         return editText;
     }
 
@@ -278,8 +288,7 @@ public class EditTag extends FrameLayout
             // do nothing, or you can tip "can't add empty tag"
             return false;
         } else {
-            if (tagAddCallBack == null || (tagAddCallBack != null
-                    && tagAddCallBack.onTagAdd(tagContent))) {
+            if (tagAddCallBack == null || (tagAddCallBack != null && tagAddCallBack.onTagAdd(tagContent))) {
                 TextView tagTextView = createTag(flowLayout, tagContent);
                 if (defaultTagBg == null) {
                     defaultTagBg = tagTextView.getBackground();

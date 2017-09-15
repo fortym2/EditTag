@@ -38,8 +38,7 @@ public class MEditText extends AppCompatEditText {
 
         @Override
         public boolean sendKeyEvent(KeyEvent event) {
-            if (event.getAction() == KeyEvent.ACTION_DOWN
-                    && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+            if (event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
                 // Un-comment if you wish to cancel the backspace:
                 // return false;
             }
@@ -52,8 +51,7 @@ public class MEditText extends AppCompatEditText {
             // called for backspace
             if (beforeLength == 1 && afterLength == 0) {
                 // backspace
-                return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL))
-                        && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
+                return sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL)) && sendKeyEvent(new KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_DEL));
             }
 
             return super.deleteSurroundingText(beforeLength, afterLength);
